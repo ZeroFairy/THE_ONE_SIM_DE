@@ -39,6 +39,7 @@ public class PeopleRankDERouter implements RoutingDecisionEngine{
             this.treshold = 100;
         }
 
+        this.PeR = new HashMap<>();
         this.connHistory = new HashMap<DTNHost, List<Duration>>();
         this.neighbors = new HashSet<DTNHost>();
         this.startConnTime = new HashMap<DTNHost, Double>();
@@ -51,6 +52,7 @@ public class PeopleRankDERouter implements RoutingDecisionEngine{
         this.dampingFactor = other.dampingFactor;
         this.treshold = other.treshold;
 
+        this.PeR = new HashMap<>();
         this.connHistory = new HashMap<DTNHost, List<Duration>>();
         this.neighbors = new HashSet<DTNHost>();
         this.startConnTime = new HashMap<DTNHost, Double>();
