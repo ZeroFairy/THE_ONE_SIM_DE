@@ -11,7 +11,7 @@ import routing.community.Duration;
 import java.util.*;
 
 public class PeopleRankDERouter implements RoutingDecisionEngine{
-    public static final String DAMPING_FACTOR_SETTINGS = "dumpingFactor";
+    public static final String DAMPING_FACTOR_SETTINGS = "dampingFactor";
     public static final String TRESHOLD_SETTINGS = "threshold";
     public static final String PEOPLERANK_DE_NS = "PeopleRankDERouter";
 
