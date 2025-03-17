@@ -88,6 +88,10 @@ public class PeopleRankDERouter implements RoutingDecisionEngine{
         double avgInterconnectionTime = this.calcInter(history);
         if (avgInterconnectionTime > this.treshold) {
             this.neighbors.add(peer);
+        } else {
+            if (this.neighbors.contains(peer)) {
+                this.neighbors.remove(peer);
+            }
         }
 
         for (Map.Entry<DTNHost, List<Duration>> entry : connHistory.entrySet()) {
@@ -187,36 +191,36 @@ public class PeopleRankDERouter implements RoutingDecisionEngine{
     }
 
     //Kalau friend != Neighbor
-//    public double calcPeR(DTNHost thisHost) {
-//        double sum = 0.0;
-//
-//        for (Tuple<Double, Integer> tuple : PeR.values()) {
-//            if (!tuple.getKey().equals(thisHost)) {
-//                double friendRanking = tuple.getKey();
-//                int totalFriends = tuple.getValue();
-//
-//                if (totalFriends > 0) {
-//                    sum += friendRanking / totalFriends;
-//                }
-//            }
-//        }
-//
-//        return (1 - this.dampingFactor) + this.dampingFactor * sum;
-//    }
-
-    //Kalau friend == Neighbor
     public double calcPeR(DTNHost thisHost) {
         double sum = 0.0;
 
-        for (DTNHost friend : neighbors) {
-            double friendRanking = this.PeR.get(friend).getKey();
-            int totalFriends = this.PeR.get(friend).getValue();
+        for (Tuple<Double, Integer> tuple : PeR.values()) {
+            if (!tuple.getKey().equals(thisHost)) {
+                double friendRanking = tuple.getKey();
+                int totalFriends = tuple.getValue();
 
-            if (totalFriends > 0) {
-                sum += friendRanking / totalFriends;
+                if (totalFriends > 0) {
+                    sum += friendRanking / totalFriends;
+                }
             }
         }
 
         return (1 - this.dampingFactor) + this.dampingFactor * sum;
     }
+
+    //Kalau friend == Neighbor
+//    public double calcPeR(DTNHost thisHost) {
+//        double sum = 0.0;
+//
+//        for (DTNHost friend : neighbors) {
+//            double friendRanking = this.PeR.get(friend).getKey();
+//            int totalFriends = this.PeR.get(friend).getValue();
+//
+//            if (totalFriends > 0) {
+//                sum += friendRanking / totalFriends;
+//            }
+//        }
+//
+//        return (1 - this.dampingFactor) + this.dampingFactor * sum;
+//    }
 }
