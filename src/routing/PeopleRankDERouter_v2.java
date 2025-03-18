@@ -81,6 +81,7 @@ public class PeopleRankDERouter_v2 implements RoutingDecisionEngine{
     public void connectionUp(DTNHost thisHost, DTNHost peer) {
         //Kalau ketemu langsung hitung dulu
 //        this.PeR = calcPeR(thisHost);
+
         this.startConnTime.put(peer, SimClock.getTime());
     }
 
@@ -91,8 +92,6 @@ public class PeopleRankDERouter_v2 implements RoutingDecisionEngine{
      */
     @Override
     public void connectionDown(DTNHost thisHost, DTNHost peer) {
-//        System.out.println("MASUK CONN" +startConnTime.toString());
-//        System.out.println("PEER : " +peer);
         double startTime = startConnTime.get(peer);
         double endTime = SimClock.getTime();
 
@@ -148,16 +147,6 @@ public class PeopleRankDERouter_v2 implements RoutingDecisionEngine{
 
     @Override
     public void doExchangeForNewConnection(Connection con, DTNHost peer) {
-//        DTNHost thisHost = con.getOtherNode(peer);
-//        PeopleRankDERouter_v2 peerDE = this.getOtherDE(peer);
-
-
-//        System.out.println("MASUK EX: " +startConnTime.toString());
-        //Untuk conHistory
-//        this.startConnTime.put(peer, SimClock.getTime());
-//        peerDE.startConnTime.put(thisHost, SimClock.getTime());
-
-//        System.out.println("KELUAR EX: " +startConnTime.toString());
     }
 
     @Override
