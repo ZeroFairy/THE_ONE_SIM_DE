@@ -95,7 +95,7 @@ public class SprayAndFocusRouterRev implements RoutingDecisionEngine {
             }
 
             if (peerHost.recentEncounters.containsKey(host)) {
-                peerTime = this.recentEncounters.get(host);
+                peerTime = peerHost.recentEncounters.get(host);
             } else {
                 peerTime = -1;
             }
