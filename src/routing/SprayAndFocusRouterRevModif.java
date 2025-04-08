@@ -131,9 +131,7 @@ public class SprayAndFocusRouterRevModif implements RoutingDecisionEngine {
 
         if ((int) m.getProperty(MSG_COUNT_PROPERTY) == 1) {
             SprayAndFocusRouterRevModif de = getOtherSNF(otherHost);
-            double myHost = this.connHistory.get(m.getTo()) != null ? this.calcInter(this.connHistory.get(m.getTo())) : 0;
-            double thatHost = de.connHistory.get(m.getTo()) != null ? de.calcInter(de.connHistory.get(m.getTo())) : 0;
-            if (myHost > thatHost) {
+            if (this.calcInter(this.connHistory.get(m.getTo())) > de.calcInter(de.connHistory.get(m.getTo()))) {
                 return true;
             }
         }
@@ -192,6 +190,11 @@ public class SprayAndFocusRouterRevModif implements RoutingDecisionEngine {
     public double calcInter(List<Duration> history) {
         double sum = 0.0;
         int counter = 0;
+
+        if (history == null) {
+            return 0.0;
+        }
+
         Iterator<Duration> it = history.iterator();
         if (!it.hasNext()) {
             return 0.0;
