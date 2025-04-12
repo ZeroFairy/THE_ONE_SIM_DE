@@ -11,16 +11,14 @@
 package routing;
 
 import core.*;
+import routing.community.Duration;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class SprayAndFocusRouterRev implements RoutingDecisionEngine {
+public class SprayAndFocusRouterRevModif implements RoutingDecisionEngine {
     public static final String NROF_COPIES = "nrofCopies";
     public static final String BINARY_MODE = "binaryMode";
-    public static final String SPRAYANDFOCUS_NS = "SprayAndFocusRouterRev";
+    public static final String SPRAYANDFOCUS_NS = "SprayAndFocusRouterRevModif";
     public static final String TIMER_THRESHOLD_S = "transitivityTimerThreshold";
     public static final String MSG_COUNT_PROPERTY = SPRAYANDFOCUS_NS + "." + "copies";
 
@@ -30,10 +28,13 @@ public class SprayAndFocusRouterRev implements RoutingDecisionEngine {
     private int initialNrofCopies;
     private boolean isBinary;
     private double transitivityTimerThreshold;
+    public Map<DTNHost, Double> startConnTime;
+    public Map<DTNHost, List<Duration>> connHistory;
 
-    protected Map<DTNHost, Double> recentEncounters;
-
-    public SprayAndFocusRouterRev(Settings s) {
+    /**
+     * Constructor
+     */
+    public SprayAndFocusRouterRevModif(Settings s) {
         Settings snfSettings = new Settings(SPRAYANDFOCUS_NS);
 
         this.initialNrofCopies = snfSettings.getInt(NROF_COPIES);
@@ -45,64 +46,45 @@ public class SprayAndFocusRouterRev implements RoutingDecisionEngine {
             this.transitivityTimerThreshold = defaultTransitivityThreshold;
         }
 
-        this.recentEncounters = new HashMap<DTNHost, Double>();
+        this.connHistory = new HashMap<DTNHost, List<Duration>>();
+        this.startConnTime = new HashMap<DTNHost, Double>();
     }
 
-    /*
+    /**
     * Copy Constructor
     */
-    protected SprayAndFocusRouterRev(SprayAndFocusRouterRev snfRouterRev) {
+    protected SprayAndFocusRouterRevModif(SprayAndFocusRouterRevModif snfRouterRev) {
         this.initialNrofCopies = snfRouterRev.initialNrofCopies;
         this.isBinary = snfRouterRev.isBinary;
-        this.recentEncounters = new HashMap<DTNHost, Double>();
+        this.connHistory = new HashMap<DTNHost, List<Duration>>();
+        this.startConnTime = new HashMap<DTNHost, Double>();
     }
 
     @Override
     public void connectionUp(DTNHost thisHost, DTNHost peer) {
-
+        this.startConnTime.put(peer, SimClock.getTime());
     }
 
     @Override
     public void connectionDown(DTNHost thisHost, DTNHost peer) {
+        double startTime = startConnTime.get(peer);
+        double endTime = SimClock.getTime();
 
-    }
-
-    //Belum selesai
-    @Override
-    public void doExchangeForNewConnection(Connection con, DTNHost peer) {
-        SprayAndFocusRouterRev peerHost = getOtherSNF(peer);
-        DTNHost thisHost = con.getOtherNode(peer);
-        double distance = thisHost.getLocation().distance(peer.getLocation());
-        double thisHostSpeed = thisHost.getPath() == null ? 0 : thisHost.getPath().getSpeed();
-        double thisHostTimeDiff = thisHostSpeed == 0.0 ? DEFAULT_TIMEDIFF : distance/thisHostSpeed;
-
-        this.recentEncounters.put(peer, SimClock.getTime());
-
-        Set<DTNHost> hostSet = new HashSet<DTNHost>();
-        hostSet.addAll(this.recentEncounters.keySet());
-        hostSet.addAll(peerHost.recentEncounters.keySet());
-
-        for (DTNHost host : hostSet) {
-            double thisTime, peerTime;
-
-            if (this.recentEncounters.containsKey(host)) {
-                thisTime = this.recentEncounters.get(host);
-            } else {
-                thisTime = -1;
-            }
-
-            if (peerHost.recentEncounters.containsKey(host)) {
-                peerTime = peerHost.recentEncounters.get(host);
-            } else {
-                peerTime = -1;
-            }
-
-            //edited
-            if (peerTime < 0 || thisTime - thisHostTimeDiff < peerTime) {
-                this.recentEncounters.put(host, peerTime + thisHostTimeDiff);
-            }
+        //Ambil history yang ada
+        List<Duration> history;
+        if (!connHistory.containsKey(peer)) {
+            history = new LinkedList<Duration>();
+            connHistory.put(peer, history);
+        } else {
+            history = connHistory.get(peer);
         }
+
+        history.add(new Duration(startTime, endTime));
+        connHistory.put(peer, history);
     }
+
+    @Override
+    public void doExchangeForNewConnection(Connection con, DTNHost peer) {}
 
     @Override
     public boolean newMessage(Message m) {
@@ -147,23 +129,20 @@ public class SprayAndFocusRouterRev implements RoutingDecisionEngine {
             return true;
         }
 
-        if (!getOtherSNF(otherHost).recentEncounters.containsKey(m.getTo())) {
-            return false;
-        }
-
-        if (!this.recentEncounters.containsKey(m.getTo())) {
-            return true;
-        }
-
-        if (getOtherSNF(otherHost).recentEncounters.get(m.getTo()) > this.recentEncounters.get(m.getTo())) {
-            return true;
+        if ((int) m.getProperty(MSG_COUNT_PROPERTY) == 1) {
+            SprayAndFocusRouterRevModif de = getOtherSNF(otherHost);
+            if (this.calcInter(this.connHistory.get(m.getTo())) > de.calcInter(de.connHistory.get(m.getTo()))) {
+                return true;
+            }
         }
 
         return false;
     }
 
+    //Kapan pesan boleh di hapus???
     @Override
     public boolean shouldDeleteSentMessage(Message m, DTNHost otherHost) {
+
         //Kalau pesan sudah sampai pada tujuan
         if (m.getTo() == otherHost) {
             return true;
@@ -189,7 +168,9 @@ public class SprayAndFocusRouterRev implements RoutingDecisionEngine {
     //Hapus pesan kalau pesan telah ada atau pesan sudah rusak???
     @Override
     public boolean shouldDeleteOldMessage(Message m, DTNHost hostReportingOld) {
-        return true;
+
+        //Kalau pesan sudah rusak
+        return m.getTtl() <= 0 || isFinalDest(m, hostReportingOld);
     }
 
     @Override
@@ -197,10 +178,36 @@ public class SprayAndFocusRouterRev implements RoutingDecisionEngine {
 
     @Override
     public RoutingDecisionEngine replicate() {
-        return new SprayAndFocusRouterRev(this);
+        return new SprayAndFocusRouterRevModif(this);
     }
 
-    private SprayAndFocusRouterRev getOtherSNF (DTNHost host) {
-        return (SprayAndFocusRouterRev)((DecisionEngineRouter)host.getRouter()).getDecisionEngine();
+    private SprayAndFocusRouterRevModif getOtherSNF (DTNHost host) {
+        return (SprayAndFocusRouterRevModif)((DecisionEngineRouter)host.getRouter()).getDecisionEngine();
+    }
+
+    // Calculate average interconnection time
+    public double calcInter(List<Duration> history) {
+        double sum = 0.0;
+        int counter = 0;
+
+        if (history == null) {
+            return 0.0;
+        }
+
+        Iterator<Duration> it = history.iterator();
+        if (!it.hasNext()) {
+            return 0.0;
+        }
+
+        Duration d = it.next();
+        Duration temp;
+        while (it.hasNext()) {
+            temp = d;
+            d = it.next();
+            sum += d.start - temp.end;
+            counter++;
+        }
+
+        return sum / counter;
     }
 }
