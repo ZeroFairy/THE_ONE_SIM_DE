@@ -74,14 +74,11 @@ public class SprayAndFocusRouterRev implements RoutingDecisionEngine {
         DTNHost thisHost = con.getOtherNode(peer);
         double distance = thisHost.getLocation().distance(peer.getLocation());
         double thisHostSpeed = thisHost.getPath() == null ? 0 : thisHost.getPath().getSpeed();
-        double peerSpeed = peer.getPath() == null ? 0 : peer.getPath().getSpeed();
         double thisHostTimeDiff = thisHostSpeed == 0.0 ? DEFAULT_TIMEDIFF : distance/thisHostSpeed;
-        double peerTimeDiff = peerSpeed == 0.0 ? DEFAULT_TIMEDIFF : distance/peerSpeed;
 
         this.recentEncounters.put(peer, SimClock.getTime());
-        peerHost.recentEncounters.put(thisHost, SimClock.getTime());
 
-        Set<DTNHost> hostSet = new HashSet<DTNHost>(this.recentEncounters.size() + peerHost.recentEncounters.size());
+        Set<DTNHost> hostSet = new HashSet<DTNHost>();
         hostSet.addAll(this.recentEncounters.keySet());
         hostSet.addAll(peerHost.recentEncounters.keySet());
 
@@ -100,12 +97,9 @@ public class SprayAndFocusRouterRev implements RoutingDecisionEngine {
                 peerTime = -1;
             }
 
-            if (peerTime < 0 || thisTime + thisHostTimeDiff < peerTime) {
-                this.recentEncounters.put(host, peerTime - thisHostTimeDiff);
-            }
-
-            if (thisTime < 0 || peerTime + peerTimeDiff < thisTime) {
-                this.recentEncounters.put(host, thisTime - peerTimeDiff);
+            //edited
+            if (peerTime < 0 || thisTime - thisHostTimeDiff < peerTime) {
+                this.recentEncounters.put(host, peerTime + thisHostTimeDiff);
             }
         }
     }
@@ -153,28 +147,23 @@ public class SprayAndFocusRouterRev implements RoutingDecisionEngine {
             return true;
         }
 
-        //Kalau
         if (!getOtherSNF(otherHost).recentEncounters.containsKey(m.getTo())) {
-            return false; //KENAPA???
+            return false;
         }
 
-        //Kalau
         if (!this.recentEncounters.containsKey(m.getTo())) {
-            return true; //KENAPA???
+            return true;
         }
 
-        //Kalau
         if (getOtherSNF(otherHost).recentEncounters.get(m.getTo()) > this.recentEncounters.get(m.getTo())) {
-            return true; //KENAPA???
+            return true;
         }
 
         return false;
     }
 
-    //Kapan pesan boleh di hapus???
     @Override
     public boolean shouldDeleteSentMessage(Message m, DTNHost otherHost) {
-
         //Kalau pesan sudah sampai pada tujuan
         if (m.getTo() == otherHost) {
             return true;
@@ -200,14 +189,11 @@ public class SprayAndFocusRouterRev implements RoutingDecisionEngine {
     //Hapus pesan kalau pesan telah ada atau pesan sudah rusak???
     @Override
     public boolean shouldDeleteOldMessage(Message m, DTNHost hostReportingOld) {
-
-        //Kalau pesan sudah rusak
-        return m.getTtl() <= 0 || isFinalDest(m, hostReportingOld);
+        return true;
     }
 
     @Override
-    public void update(DTNHost thisHost) {
-    }
+    public void update(DTNHost thisHost) {}
 
     @Override
     public RoutingDecisionEngine replicate() {

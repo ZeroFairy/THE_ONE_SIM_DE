@@ -174,8 +174,7 @@ public class SprayAndFocusRouterRevModif implements RoutingDecisionEngine {
     }
 
     @Override
-    public void update(DTNHost thisHost) {
-    }
+    public void update(DTNHost thisHost) {}
 
     @Override
     public RoutingDecisionEngine replicate() {
