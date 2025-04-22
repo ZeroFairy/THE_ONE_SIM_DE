@@ -55,7 +55,7 @@ import routing.RoutingDecisionEngine;
  * @author PJ Dillon, University of Pittsburgh
  *
  */
-public class DistributedBubbleRap implements RoutingDecisionEngine, CommunityDetectionEngine
+public class DistributedBubbleRap implements RoutingDecisionEngine, CommunityDetectionEngine, GetGlobalPopularity
 {
 	/** Community Detection Algorithm to employ -setting id {@value} */
 	public static final String COMMUNITY_ALG_SETTING = "communityDetectAlg";
@@ -67,6 +67,11 @@ public class DistributedBubbleRap implements RoutingDecisionEngine, CommunityDet
 	
 	protected CommunityDetection community;
 	protected Centrality centrality;
+
+//	//    ADDED JORDAN
+//	private int timeInterval, lastUpdateTime;
+//	private Set<DTNHost> encouterHosts;
+//	public List<Integer> popularityPerTime;
 	
 	/**
 	 * Constructs a DistributedBubbleRap Decision Engine based upon the settings
@@ -103,6 +108,11 @@ public class DistributedBubbleRap implements RoutingDecisionEngine, CommunityDet
 		this.centrality = proto.centrality.replicate();
 		startTimestamps = new HashMap<DTNHost, Double>();
 		connHistory = new HashMap<DTNHost, List<Duration>>();
+
+//		this.timeInterval = 24 * 60 * 60;
+//		this.lastUpdateTime = 0;
+//		this.popularityPerTime = new LinkedList<>();
+//		this.encouterHosts = new HashSet<>();
 	}
 
 	public void connectionUp(DTNHost thisHost, DTNHost peer){}
@@ -129,6 +139,10 @@ public class DistributedBubbleRap implements RoutingDecisionEngine, CommunityDet
 //		double time = startTimestamps.get(peer);
 		double time = cek(thisHost, peer);
 		double etime = SimClock.getTime();
+
+//		if (!this.encouterHosts.contains(peer)) {
+//			this.encouterHosts.add(peer);
+//		}
 		
 		// Find or create the connection history list
 		List<Duration> history;
@@ -248,6 +262,10 @@ public class DistributedBubbleRap implements RoutingDecisionEngine, CommunityDet
 		return this.centrality.getGlobalCentrality(connHistory);
 	}
 
+	public ArrayList<Integer> getGlobalPopularity() {
+		return this.centrality.getGlobalPopularity(connHistory);
+	}
+
 	private DistributedBubbleRap getOtherDecisionEngine(DTNHost h)
 	{
 		MessageRouter otherRouter = h.getRouter();
@@ -259,6 +277,22 @@ public class DistributedBubbleRap implements RoutingDecisionEngine, CommunityDet
 
 	public Set<DTNHost> getLocalCommunity() {return this.community.getLocalCommunity();}
 
-    @Override
-    public void update(DTNHost thisHost) {}
+	@Override
+	public void update(DTNHost thisHost){}
+
+//	@Override
+//	public void update(DTNHost thisHost) {
+//		if ((SimClock.getIntTime() - this.lastUpdateTime) >= this.timeInterval) {
+//
+////			System.out.println(thisHost.getAddress() + " -->  encounter Host : " + this.encouterHosts.size());
+//
+//			popularityPerTime.add(this.encouterHosts.size());
+//			this.lastUpdateTime = SimClock.getIntTime();
+//			this.encouterHosts.clear();
+//		}
+//	}
+//
+//	public List<Integer> getPopularityPerTime() {
+//		return popularityPerTime;
+//	}
 }

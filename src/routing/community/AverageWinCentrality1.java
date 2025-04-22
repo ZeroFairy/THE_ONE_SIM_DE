@@ -32,9 +32,9 @@ public class AverageWinCentrality1 implements Centrality {
 	
 	//temporary inserted !!!
 	protected int [] globalCentralities = new int[EPOCH_COUNT];
-	
-	
-	
+
+	protected ArrayList<Integer> popularity;
+
 	public AverageWinCentrality1 (Settings s)
 	{
 		if (s.contains(CENTRALITY_WINDOW_SETTING))
@@ -237,7 +237,9 @@ public class AverageWinCentrality1 implements Centrality {
 		return new AverageWinCentrality1(this);
 	}
 
-
+	public ArrayList<Integer> getGlobalPopularity(Map<DTNHost, List<Duration>> connHistory) {
+		return popularity;
+	}
 	
 	
 	

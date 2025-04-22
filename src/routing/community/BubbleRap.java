@@ -7,6 +7,7 @@ package routing.community;
 import java.util.*;
 
 import core.*;
+import lombok.Getter;
 import routing.DecisionEngineRouter;
 import routing.MessageRouter;
 import routing.RoutingDecisionEngine;
@@ -22,6 +23,10 @@ public class BubbleRap implements RoutingDecisionEngine, CommunityDetectionEngin
 
     protected CommunityDetection community; // added
     protected Centrality centrality;
+
+//    ADDED JORDAN
+    private int timeInterval, lastUpdateTime, meet;
+    public List<Integer> popularityPerTime;
 
     // End-initialisation
     // Constructor based on the settings
@@ -46,6 +51,11 @@ public class BubbleRap implements RoutingDecisionEngine, CommunityDetectionEngin
         this.centrality = proto.centrality.replicate();
         startTimestamps = new HashMap<DTNHost, Double>();
         connHistory = new HashMap<DTNHost, List<Duration>>();
+
+        this.timeInterval = 24 * 60 * 60;
+        this.lastUpdateTime = 0;
+        this.popularityPerTime = new LinkedList<>();
+        this.meet = 0;
     }
 
     public void connectionUp(DTNHost thisHost, DTNHost peer) {
@@ -73,6 +83,7 @@ public class BubbleRap implements RoutingDecisionEngine, CommunityDetectionEngin
         if (!connHistory.containsKey(peer)) {
             history = new LinkedList<Duration>();
             connHistory.put(peer, history);
+            meet++;
         } else {
             history = connHistory.get(peer);
         }
@@ -175,6 +186,7 @@ public class BubbleRap implements RoutingDecisionEngine, CommunityDetectionEngin
         return this.centrality.getLocalCentrality(connHistory, community);
     }
 
+    //Change protected to public
     protected double getGlobalCentrality() {
         return this.centrality.getGlobalCentrality(connHistory);
     }
@@ -195,6 +207,14 @@ public class BubbleRap implements RoutingDecisionEngine, CommunityDetectionEngin
 
     @Override
     public void update(DTNHost thisHost) {
+//        if ((SimClock.getIntTime() - this.lastUpdateTime) >= this.timeInterval) {
+//            popularityPerTime.add(this.meet);
+//            this.lastUpdateTime = SimClock.getIntTime();
+//            this.meet = 0;
+//        }
     }
 
+//    public List<Integer> getPopularityPerTime() {
+//        return popularityPerTime;
+//    }
 }

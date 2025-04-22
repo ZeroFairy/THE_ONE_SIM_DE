@@ -6,6 +6,7 @@
  */
 package routing.community;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -95,6 +96,8 @@ public class SWindowCentrality implements Centrality {
      */
     protected int lastLocalComputationTime;
 
+    protected  ArrayList<Integer> popularity;
+
     public SWindowCentrality(Settings s) {
         if (s.contains(CENTRALITY_WINDOW_SETTING)) {
             CENTRALITY_TIME_WINDOW = s.getInt(CENTRALITY_WINDOW_SETTING);
@@ -156,5 +159,9 @@ public class SWindowCentrality implements Centrality {
 
     public Centrality replicate() {
         return new SWindowCentrality(this);
+    }
+
+    public ArrayList<Integer> getGlobalPopularity(Map<DTNHost, List<Duration>> connHistory) {
+        return popularity;
     }
 }

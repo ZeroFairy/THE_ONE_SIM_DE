@@ -6,6 +6,7 @@
  */
 package routing.community;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +48,8 @@ import core.*;
  */
 public class DegreeCentrality implements Centrality
 {
+	protected ArrayList<Integer> popularity;
+
 	public DegreeCentrality(Settings s){}
 	public DegreeCentrality(DegreeCentrality proto){}
 	
@@ -70,6 +73,10 @@ public class DegreeCentrality implements Centrality
 	public Centrality replicate()
 	{
 		return new DegreeCentrality(this);
+	}
+
+	public ArrayList<Integer> getGlobalPopularity(Map<DTNHost, List<Duration>> connHistory) {
+		return popularity;
 	}
 
 }
