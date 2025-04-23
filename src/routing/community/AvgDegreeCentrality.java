@@ -87,6 +87,8 @@ public class AvgDegreeCentrality implements Centrality
 	protected int lastGlobalComputationTime;
 	/** timestamp of last local centrality computation */ 
 	protected int lastLocalComputationTime;
+
+	protected ArrayList<Integer> popularity;
 	
 	public AvgDegreeCentrality(Settings s) 
 	{
@@ -227,6 +229,10 @@ public class AvgDegreeCentrality implements Centrality
 	public Centrality replicate()
 	{
 		return new AvgDegreeCentrality(this);
+	}
+
+	public ArrayList<Integer> getGlobalPopularity(Map<DTNHost, List<Duration>> connHistory) {
+		return popularity;
 	}
 
 }

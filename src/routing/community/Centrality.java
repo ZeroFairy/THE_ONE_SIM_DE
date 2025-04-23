@@ -64,4 +64,6 @@ public interface Centrality
 	
 	//Ini tambahanku sementara
 	//public int [] getGlobalArrayCentrality (Map<DTNHost, List<Duration>> connHistory);
+
+	public ArrayList<Integer> getGlobalPopularity(Map<DTNHost, List<Duration>> connHistory);
 }
