@@ -1,16 +1,16 @@
 
-#
+##########################################################################################
 # Default settings for the simulation
-#
+##########################################################################################
 
 ## Scenario settings
-Scenario.name = Popularity_Per_time-Jordan-TRY-ARRAY-v2-FULL
-Scenario.simulateConnections = false
-# Scenario.updateInterval = 0.1
-Scenario.updateInterval = 1
+Scenario.name = SprayAndWait
+Scenario.simulateConnections = true
+Scenario.updateInterval = 0.1
 # 43200s == 12h
-# Reality 16981816
-Scenario.endTime = 16981816
+# 172800s == 48h
+# 16981816 == Reality dataset
+Scenario.endTime = 100000
 
 ## Interface-specific settings:
 # type : which interface class the interface belongs to
@@ -33,7 +33,10 @@ highspeedInterface.transmitRange = 1000
 # Define 6 different node groups
 Scenario.nrofHostGroups = 1
 
-## Group-specific settings:
+##########################################################################################
+# Group-specific settings:
+##########################################################################################
+
 # groupID : Group's identifier. Used as the prefix of host names
 # nrofHosts: number of hosts in the group
 # movementModel: movement model of the hosts (valid class name from movement package)
@@ -52,21 +55,11 @@ Scenario.nrofHostGroups = 1
 # routeFile: route's file path - for MapRouteMovement
 # routeType: route's type - for MapRouteMovement
 
+
 # Common settings for all groups
-# Group.movementModel = ShortestPathMapBasedMovement
-Group.movementModel = StationaryMovement
-Group.nodeLocation = 10, 10
-
-
-#For DecisionEngineRouter
+Group.movementModel = RandomWaypoint
+# Group.router = SprayAndWaitRouter
 Group.router = DecisionEngineRouter
-DecisionEngineRouter.decisionEngine = community.DistributedBubbleRap
-DecisionEngineRouter.communityDetectAlg = routing.community.KCliqueCommunityDetection
-DecisionEngineRouter.K = 5
-DecisionEngineRouter.familiarThreshold = 700
-DecisionEngineRouter.centralityAlg = routing.community.CWindowCentrality
-
-
 Group.bufferSize = 5M
 Group.waitTime = 0, 120
 # All nodes have the bluetooth interface
@@ -77,50 +70,61 @@ Group.speed = 0.5, 1.5
 # Message TTL of 300 minutes (5 hours)
 Group.msgTtl = 300
 
-Group.nrofHosts = 97
+Group.nrofHosts = 100
 
 # group1 (pedestrians) specific settings
 Group1.groupID = p
 
+##########################################################################################
+# DECISION ENGINE ROUTER CONFIGURATION
+##########################################################################################
 
-# ## Message creation parameters
-# # How many event generators
-# Events.nrof = 1
-# # Class of the first event generator
-# Events1.class = MessageEventGenerator
-# # (following settings are specific for the MessageEventGenerator class)
-# # Creation interval in seconds (one new message every 25 to 35 seconds)
-# Events1.interval = 25,35
-# # Message sizes (500kB - 1MB)
-# Events1.size = 500k,1M
-# # range of message source/destination addresses
-# Events1.hosts = 0,96
-# # Message ID prefix
-# Events1.prefix = M
+DecisionEngineRouter.decisionEngine = SprayAndWaitDERouter
+DecisionEngineRouter.nrofCopies = 10
+DecisionEngineRouter.binaryMode = true
 
-## Event 1
-Events1.class = ExternalEventsQueue
+##########################################################################################
+# ROUTER CONFIGURATION
+##########################################################################################
+
+SnWDE.nrofCopies = 10
+SnWDE.binaryMode = true
+
+# Fallback
+# Group.nrofCopies = 10
+# Group.binaryMode = true
+
+# Fallback
+# SnWDecisionEngine.nrofCopies = 10
+# SnWDecisionEngine.binaryMode = true
+
+##########################################################################################
+# Message creation parameters
+##########################################################################################
+
+# How many event generators
 Events.nrof = 1
-Events1.filePath = ./data/Reality/RealityConnectionTraceFinal.txt
-# Events1.filePath = ./data/Reality/Haggle3-Infocom5.txt
+# Class of the first event generator
+Events1.class = MessageEventGenerator
+# (following settings are specific for the MessageEventGenerator class)
+# Creation interval in seconds (one new message every 25 to 35 seconds)
 Events1.interval = 25,35
-Events1.size = 500k,1M
-Events1.hosts = 0,96
-Events1.prefix = E
+# Message sizes (500kB - 1MB)
+Events1.size = 100k,250k
+# range of message source/destination addresses
+Events1.hosts = 0,99
+# Message ID prefix
+Events1.prefix = M
 
-## Event 2
-Events2.class = MessageEventGenerator
-Events2.interval = 580,620
-# Events2.size = 500k,750k
-Events2.size = 250k,500k
-Events2.hosts = 0,99
-Events2.prefix = M
 
-## Movement model settings
+##########################################################################################
+# Movement model settings
+##########################################################################################
+
 # seed for movement models' pseudo random number generator (default = 0)
 MovementModel.rngSeed = 1
 # World's size for Movement Models without implicit size (width, height; meters)
-MovementModel.worldSize = 4500, 3400
+MovementModel.worldSize = 300, 300
 # How long time to move hosts in the world before real simulation
 MovementModel.warmup = 1000
 
@@ -132,24 +136,43 @@ MapBasedMovement.mapFile2 = data/main_roads.wkt
 MapBasedMovement.mapFile3 = data/pedestrian_paths.wkt
 MapBasedMovement.mapFile4 = data/shops.wkt
 
-## Reports - all report names have to be valid report classes
+##########################################################################################
+# Reports - all report names have to be valid report classes
+##########################################################################################
 
 # how many reports to load
-Report.nrofReports = 1
+Report.nrofReports = 3
 # length of the warm up period (simulated seconds)
-Report.warmup = 0
+Report.warmup = 1
 # default directory of reports (can be overridden per Report with output setting)
-Report.reportDir = reports/bubble_rap
+Report.reportDir = reports/RandomWaypoint
+
 # Report classes to load
-Report.report1 = GlobalPopularityDetectionReport
+Report.report1 = MessageStatsReport
+Report.report2 = ContactTimesReport
+Report.report3 = PeriodicStatsReporter
+
+# Report.report4 = DeliveredMessagesReport
+# Report.report5 = MessageDroppedReport
+# Report.report6 = MessageCreatedReport
+# Report.report7 = MessageDroppedWithIntervalReport
+# Report.report8 = BufferOccupancyPerNodeReport
+# Report.report9 = MessageDroppedWithIntervalReport2
 
 ## Optimization settings -- these affect the speed of the simulation
 ## see World class for details.
 Optimization.cellSizeMult = 5
 Optimization.randomizeUpdateOrder = true
 
+##########################################################################################
+# REPORT SPECIFIC SETTINGS
+##########################################################################################
 
+PeriodicStatsReporter.updateInterval = 1000
+
+##########################################################################################
 ## GUI settings
+##########################################################################################
 
 # GUI underlay image settings
 GUI.UnderlayImage.fileName = data/helsinki_underlay.png

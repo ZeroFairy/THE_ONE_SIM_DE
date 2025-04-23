@@ -89,7 +89,9 @@ public class CWindowCentrality implements Centrality
 	protected int lastLocalComputationTime;
 
 //	protected ArrayList<Integer> popularity;
-	protected static int REPORT_TIME_WINDOW = 21600;
+//	protected static int REPORT_TIME_WINDOW = 21600;
+	protected static int REPORT_TIME_WINDOW = 86400;
+
 //	private Map<Integer, Set<DTNHost>> nodesCountedInEpoch;
 
 	public CWindowCentrality(Settings s) 
