@@ -50,12 +50,11 @@ public class ProphetRouterFromPaper extends ProphetRouter {
 	/**
 	 * Added by Jordan Vincent
 	 * Updates previous delivery predictions for a host (the encounter host (other router)).
-	 * @param Othhost The host we just met
+	 * @param host The host we just met
 	 */
-	private void updatePrevDeliveryPredFor(DTNHost Othhost, DTNHost destHost) {
-		ProphetRouterFromPaper othRouter = (ProphetRouterFromPaper) Othhost.getRouter();
-		double oldValue = othRouter.getPredFor(Othhost);
-		othRouter.prevPreds.put(Othhost, oldValue);
+	private void updatePrevDeliveryPredFor(DTNHost host) {
+		double oldValue = getPredFor(host);
+		prevPreds.put(host, oldValue);
 	}
 
 	/**
@@ -102,7 +101,7 @@ public class ProphetRouterFromPaper extends ProphetRouter {
 			for (Message m : msgCollection) {
 				if (m.getTo() == other) {
 					messages.add(new Tuple<Message, Connection>(m,con));
-					updatePrevDeliveryPredFor(other, m.getTo());
+					othRouter.updatePrevDeliveryPredFor(m.getTo());
 					continue;
 				}
 
@@ -126,7 +125,7 @@ public class ProphetRouterFromPaper extends ProphetRouter {
 						}
 					}
 					messages.add(new Tuple<Message, Connection>(m,con));
-					updatePrevDeliveryPredFor(other, m.getTo());
+					othRouter.updatePrevDeliveryPredFor(m.getTo());
 				}
 			}
 		}
