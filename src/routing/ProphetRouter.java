@@ -47,14 +47,14 @@ public class ProphetRouter extends ActiveRouter {
 	public static final String BETA_S = "beta";
 
 	/** the value of nrof seconds in time unit -setting */
-	private int secondsInTimeUnit;
+	protected int secondsInTimeUnit;
 	/** value of beta setting */
-	private double beta;
+	protected double beta;
 
 	/** delivery predictabilities */
-	private Map<DTNHost, Double> preds;
+	protected Map<DTNHost, Double> preds;
 	/** last delivery predictability update (sim)time */
-	private double lastAgeUpdate;
+	protected double lastAgeUpdate;
 	
 	/**
 	 * Constructor. Creates a new message router based on the settings in
@@ -197,8 +197,7 @@ public class ProphetRouter extends ActiveRouter {
 		if (exchangeDeliverableMessages() != null) {
 			return;
 		}
-		System.out.println(tryOtherMessages());
-		tryOtherMessages();		
+		tryOtherMessages();
 	}
 	
 	/**
@@ -300,5 +299,4 @@ public class ProphetRouter extends ActiveRouter {
 		ProphetRouter r = new ProphetRouter(this);
 		return r;
 	}
-
 }
