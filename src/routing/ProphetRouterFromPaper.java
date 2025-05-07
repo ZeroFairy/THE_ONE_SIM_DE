@@ -108,7 +108,7 @@ public class ProphetRouterFromPaper extends ProphetRouter {
 				if (othRouter.hasMessage(m.getId())) {
 					continue; // skip messages that the other one has
 				}
-				tryAllMessagesToAllConnections();
+//				tryAllMessagesToAllConnections();
 
 				// the other node has higher probability of delivery
 				// P(B, D) > P(A, D)

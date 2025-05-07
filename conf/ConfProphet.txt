@@ -1,5 +1,5 @@
 ## Scenario settings
-Scenario.name = Prophet_Paper
+Scenario.name = Prophet
 Scenario.simulateConnections = true
 Scenario.updateInterval = 0.1
 # 43200s == 12h
@@ -48,7 +48,7 @@ Scenario.nrofHostGroups = 1
 
 # Common settings for all groups
 Group.movementModel = ShortestPathMapBasedMovement
-Group.router = ProphetRouterFromPaper
+Group.router = ProphetRouter
 ProphetRouter.secondsInTimeUnit = 30
 Group.bufferSize = 50M
 Group.waitTime = 0, 120
@@ -57,7 +57,7 @@ Group.nrofInterfaces = 1
 Group.interface1 = btInterface
 # Walking speeds
 Group.speed = 0.5, 1.5
-#Group.speed = 2.5, 3
+# Group.speed = 2.5, 3
 # Message TTL of 300 minutes (5 hours)
 Group.msgTtl = 300
 
@@ -88,7 +88,7 @@ Events1.prefix = M
 # seed for movement models' pseudo random number generator (default = 0)
 MovementModel.rngSeed = 5
 # World's size for Movement Models without implicit size (width, height; meters)
-MovementModel.worldSize = 4500, 3400
+MovementModel.worldSize = 5000, 5000
 # How long time to move hosts in the world before real simulation
 MovementModel.warmup = 1000
 
@@ -112,10 +112,16 @@ Report.reportDir = reports/
 Report.report1 = MessageStatsReport
 #Report.report2 = ContactTimesReport
 
+## Default settings for some routers settings
+ProphetRouter.secondsInTimeUnit = 30
+SprayAndWaitRouter.nrofCopies = 10
+SprayAndWaitRouter.binaryMode = true
+
 ## Optimization settings -- these affect the speed of the simulation
 ## see World class for details.
 Optimization.cellSizeMult = 5
 Optimization.randomizeUpdateOrder = true
+
 
 ## GUI settings
 
